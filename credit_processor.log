@@ -1,0 +1,197 @@
+2025-07-29 20:51:47,152 - INFO - Extracting paragraphs from ./data/credit_history.pdf (pages 1-10)
+2025-07-29 20:51:47,456 - INFO - Extracted 4 paragraphs
+2025-07-29 20:51:47,457 - INFO - Starting paragraph processing...
+2025-07-29 20:51:47,457 - INFO - Processing 4 paragraphs in batches of 2
+2025-07-29 20:51:50,494 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:51:50,520 - INFO - Successfully processed paragraph 1
+2025-07-29 20:51:54,589 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:51:54,602 - INFO - Successfully processed paragraph 2
+2025-07-29 20:51:55,603 - INFO - Completed batch 1
+2025-07-29 20:52:04,625 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:52:04,638 - INFO - Successfully processed paragraph 3
+2025-07-29 20:52:08,721 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:52:08,735 - INFO - Successfully processed paragraph 4
+2025-07-29 20:52:09,736 - INFO - Completed batch 2
+2025-07-29 20:52:09,736 - INFO - Processing complete. Successfully processed 4/4 paragraphs
+2025-07-29 20:52:09,736 - INFO - Exporting loan data to example_output_20250729_205209.csv
+2025-07-29 20:53:22,626 - INFO - Step 1: Extracting paragraphs from PDF
+2025-07-29 20:53:22,626 - INFO - Extracting paragraphs from credit_history.pdf (pages 1-100)
+2025-07-29 20:53:22,626 - ERROR - Processing failed: [Errno 2] No such file or directory: 'credit_history.pdf'
+2025-07-29 20:53:28,871 - INFO - Step 1: Extracting paragraphs from PDF
+2025-07-29 20:53:28,871 - INFO - Extracting paragraphs from credit_history.pdf (pages 5-100)
+2025-07-29 20:53:28,871 - ERROR - Processing failed: [Errno 2] No such file or directory: 'credit_history.pdf'
+2025-07-29 20:53:47,271 - INFO - Step 1: Extracting paragraphs from PDF
+2025-07-29 20:53:47,271 - INFO - Extracting paragraphs from ./data/credit_history.pdf (pages 5-100)
+2025-07-29 20:53:49,296 - INFO - Processed page 50
+2025-07-29 20:53:50,585 - INFO - Processed page 100
+2025-07-29 20:53:50,585 - INFO - Extracted 24 paragraphs
+2025-07-29 20:53:50,585 - INFO - Step 2: Processing paragraphs with AI
+2025-07-29 20:53:50,585 - INFO - Starting paragraph processing...
+2025-07-29 20:53:50,586 - INFO - Processing 24 paragraphs in batches of 5
+2025-07-29 20:53:53,985 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:53:54,003 - INFO - Successfully processed paragraph 1
+2025-07-29 20:53:59,110 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:53:59,119 - INFO - Successfully processed paragraph 2
+2025-07-29 20:54:03,002 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:03,011 - INFO - Successfully processed paragraph 3
+2025-07-29 20:54:07,042 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:07,056 - INFO - Successfully processed paragraph 4
+2025-07-29 20:54:10,989 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:11,002 - INFO - Successfully processed paragraph 5
+2025-07-29 20:54:12,002 - INFO - Completed batch 1
+2025-07-29 20:54:14,522 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:14,531 - INFO - Successfully processed paragraph 6
+2025-07-29 20:54:18,055 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:18,067 - INFO - Successfully processed paragraph 7
+2025-07-29 20:54:21,641 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:21,654 - INFO - Successfully processed paragraph 8
+2025-07-29 20:54:25,183 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:25,197 - INFO - Successfully processed paragraph 9
+2025-07-29 20:54:28,911 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:28,924 - INFO - Successfully processed paragraph 10
+2025-07-29 20:54:28,924 - INFO - Progress: 10/24 (41.7%)
+2025-07-29 20:54:29,925 - INFO - Completed batch 2
+2025-07-29 20:54:32,288 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:32,301 - INFO - Successfully processed paragraph 11
+2025-07-29 20:54:36,384 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:36,398 - INFO - Successfully processed paragraph 12
+2025-07-29 20:54:40,173 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:40,187 - INFO - Successfully processed paragraph 13
+2025-07-29 20:54:44,167 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:44,180 - INFO - Successfully processed paragraph 14
+2025-07-29 20:54:47,956 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:47,970 - INFO - Successfully processed paragraph 15
+2025-07-29 20:54:48,970 - INFO - Completed batch 3
+2025-07-29 20:54:51,698 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:51,713 - INFO - Successfully processed paragraph 16
+2025-07-29 20:54:55,943 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:55,957 - INFO - Successfully processed paragraph 17
+2025-07-29 20:54:59,857 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:54:59,871 - INFO - Successfully processed paragraph 18
+2025-07-29 20:55:05,774 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:55:05,788 - INFO - Successfully processed paragraph 19
+2025-07-29 20:55:09,460 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:55:09,475 - INFO - Successfully processed paragraph 20
+2025-07-29 20:55:09,475 - INFO - Progress: 20/24 (83.3%)
+2025-07-29 20:55:10,476 - INFO - Completed batch 4
+2025-07-29 20:55:13,671 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:55:13,688 - INFO - Successfully processed paragraph 21
+2025-07-29 20:55:17,447 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:55:17,462 - INFO - Successfully processed paragraph 22
+2025-07-29 20:55:23,080 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:55:23,095 - INFO - Successfully processed paragraph 23
+2025-07-29 20:55:26,868 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 20:55:26,883 - INFO - Successfully processed paragraph 24
+2025-07-29 20:55:27,883 - INFO - Completed batch 5
+2025-07-29 20:55:27,883 - INFO - Processing complete. Successfully processed 24/24 paragraphs
+2025-07-29 20:55:27,884 - INFO - Step 3: Exporting to CSV
+2025-07-29 20:55:27,884 - INFO - Exporting loan data to loans_20250729_205347.csv
+2025-07-29 20:55:27,885 - ERROR - Processing failed: cannot convert dictionary update sequence element #0 to a sequence
+2025-07-29 21:09:42,102 - INFO - Step 1: Extracting paragraphs from PDF
+2025-07-29 21:09:42,102 - INFO - Extracting paragraphs from ./data/credit_history.pdf (pages 5-10)
+2025-07-29 21:09:42,161 - INFO - Extracted loan entry: 1. АО "Райффайзенбанк" - Договор займа (кредита) - Иной заем (кредит) Сведения об источнике Основные...
+2025-07-29 21:09:42,350 - INFO - Extracted 1 paragraphs
+2025-07-29 21:09:42,350 - INFO - Step 2: Processing paragraphs with AI
+2025-07-29 21:09:42,350 - INFO - Starting paragraph processing...
+2025-07-29 21:09:42,351 - INFO - Processing 1 paragraphs in batches of 5
+2025-07-29 21:09:46,123 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:09:46,140 - INFO - Successfully processed paragraph 25
+2025-07-29 21:09:47,140 - INFO - Completed batch 1
+2025-07-29 21:09:47,140 - INFO - Processing complete. Successfully processed 1/1 paragraphs
+2025-07-29 21:09:47,140 - INFO - Step 3: Exporting to CSV
+2025-07-29 21:09:47,141 - INFO - Exporting loan data to test_output.csv
+2025-07-29 21:09:47,142 - ERROR - Processing failed: cannot convert dictionary update sequence element #0 to a sequence
+2025-07-29 21:11:34,260 - INFO - Step 1: Extracting paragraphs from PDF
+2025-07-29 21:11:34,260 - INFO - Extracting paragraphs from ./data/credit_history.pdf (pages 5-10)
+2025-07-29 21:11:34,314 - INFO - Extracted loan entry: 1. АО "Райффайзенбанк" - Договор займа (кредита) - Иной заем (кредит) Сведения об источнике Основные...
+2025-07-29 21:11:34,497 - INFO - Extracted 1 paragraphs
+2025-07-29 21:11:34,498 - INFO - Step 2: Processing paragraphs with AI
+2025-07-29 21:11:34,498 - INFO - Starting paragraph processing...
+2025-07-29 21:11:34,498 - INFO - Processing 1 paragraphs in batches of 5
+2025-07-29 21:11:38,664 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:11:38,682 - INFO - Successfully processed paragraph 26
+2025-07-29 21:11:39,682 - INFO - Completed batch 1
+2025-07-29 21:11:39,682 - INFO - Processing complete. Successfully processed 1/1 paragraphs
+2025-07-29 21:11:39,683 - INFO - Step 3: Exporting to CSV
+2025-07-29 21:11:39,683 - INFO - Exporting loan data to test_output_fixed.csv
+2025-07-29 21:11:39,685 - INFO - CSV export completed: test_output_fixed.csv
+2025-07-29 21:11:39,687 - INFO - Processing Statistics:
+2025-07-29 21:11:39,687 - INFO -   Total paragraphs: 26
+2025-07-29 21:11:39,687 - INFO -   Processed paragraphs: 26
+2025-07-29 21:11:39,687 - INFO -   Extracted loans: 26
+2025-07-29 21:11:39,687 - INFO -   Errors: 0
+2025-07-29 21:11:39,687 - INFO -   Success rate: 100.0%
+2025-07-29 21:14:15,451 - INFO - Step 1: Extracting paragraphs from PDF
+2025-07-29 21:14:15,452 - INFO - Extracting paragraphs from ./data/credit_history.pdf (pages 5-75)
+2025-07-29 21:14:15,505 - INFO - Extracted loan entry: 1. АО "Райффайзенбанк" - Договор займа (кредита) - Иной заем (кредит) Сведения об источнике Основные...
+2025-07-29 21:14:15,738 - INFO - Extracted loan entry: 2. Банк ВТБ (ПАО) - Договор займа (кредита) - Иной необеспеченный заем (кредит) Сведения об источник...
+2025-07-29 21:14:16,022 - INFO - Extracted loan entry: 3. Банк ВТБ (ПАО) - Договор займа (кредита) - Иной необеспеченный заем (кредит) Сведения об источник...
+2025-07-29 21:14:17,284 - INFO - Extracted loan entry: 4. Банк ВТБ (ПАО) - Договор займа (кредита) - Иной заем (кредит) Сведения об источнике Основные свед...
+2025-07-29 21:14:17,343 - INFO - Processed page 50
+2025-07-29 21:14:17,364 - INFO - Extracted loan entry: 5. ПАО "МТС-Банк" - Договор займа (кредита) - Иной заем (кредит) Сведения об источнике Основные свед...
+2025-07-29 21:14:17,781 - INFO - Extracted loan entry: 6. Банк ВТБ (ПАО) - Договор займа (кредита) - Кредит с ипотекой Сведения об источнике Основные сведе...
+2025-07-29 21:14:18,309 - INFO - Extracted 6 paragraphs
+2025-07-29 21:14:18,309 - INFO - Step 2: Processing paragraphs with AI
+2025-07-29 21:14:18,309 - INFO - Starting paragraph processing...
+2025-07-29 21:14:18,310 - INFO - Processing 6 paragraphs in batches of 5
+2025-07-29 21:14:21,482 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:14:21,499 - INFO - Successfully processed paragraph 27
+2025-07-29 21:14:27,503 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:14:27,517 - INFO - Successfully processed paragraph 28
+2025-07-29 21:14:31,005 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:14:31,015 - INFO - Successfully processed paragraph 29
+2025-07-29 21:14:35,105 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:14:35,120 - INFO - Successfully processed paragraph 30
+2025-07-29 21:14:38,890 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:14:38,903 - INFO - Successfully processed paragraph 31
+2025-07-29 21:14:39,904 - INFO - Completed batch 1
+2025-07-29 21:14:45,545 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:14:45,558 - INFO - Successfully processed paragraph 32
+2025-07-29 21:14:46,559 - INFO - Completed batch 2
+2025-07-29 21:14:46,559 - INFO - Processing complete. Successfully processed 6/6 paragraphs
+2025-07-29 21:14:46,559 - INFO - Step 3: Exporting to CSV
+2025-07-29 21:14:46,560 - INFO - Exporting loan data to loans_20250729_211415.csv
+2025-07-29 21:14:46,562 - INFO - CSV export completed: loans_20250729_211415.csv
+2025-07-29 21:14:46,563 - INFO - Processing Statistics:
+2025-07-29 21:14:46,563 - INFO -   Total paragraphs: 32
+2025-07-29 21:14:46,563 - INFO -   Processed paragraphs: 32
+2025-07-29 21:14:46,563 - INFO -   Extracted loans: 32
+2025-07-29 21:14:46,564 - INFO -   Errors: 0
+2025-07-29 21:14:46,564 - INFO -   Success rate: 100.0%
+2025-07-29 21:18:21,650 - INFO - Step 1: Extracting paragraphs from PDF
+2025-07-29 21:18:21,650 - INFO - Extracting paragraphs from ./data/credit_history.pdf (pages 5-75)
+2025-07-29 21:18:21,700 - INFO - Extracted loan entry: 1. АО "Райффайзенбанк" - Договор займа (кредита) - Иной заем (кредит) Сведения об источнике Основные...
+2025-07-29 21:18:21,919 - INFO - Extracted loan entry: 2. Банк ВТБ (ПАО) - Договор займа (кредита) - Иной необеспеченный заем (кредит) Сведения об источник...
+2025-07-29 21:18:22,209 - INFO - Extracted loan entry: 3. Банк ВТБ (ПАО) - Договор займа (кредита) - Иной необеспеченный заем (кредит) Сведения об источник...
+2025-07-29 21:18:23,420 - INFO - Extracted loan entry: 4. Банк ВТБ (ПАО) - Договор займа (кредита) - Иной заем (кредит) Сведения об источнике Основные свед...
+2025-07-29 21:18:23,479 - INFO - Processed page 50
+2025-07-29 21:18:23,499 - INFO - Extracted loan entry: 5. ПАО "МТС-Банк" - Договор займа (кредита) - Иной заем (кредит) Сведения об источнике Основные свед...
+2025-07-29 21:18:23,916 - INFO - Extracted loan entry: 6. Банк ВТБ (ПАО) - Договор займа (кредита) - Кредит с ипотекой Сведения об источнике Основные сведе...
+2025-07-29 21:18:24,442 - INFO - Extracted 6 paragraphs
+2025-07-29 21:18:24,443 - INFO - Step 2: Processing paragraphs with AI
+2025-07-29 21:18:24,443 - INFO - Starting paragraph processing...
+2025-07-29 21:18:24,443 - INFO - Processing 6 paragraphs in batches of 5
+2025-07-29 21:18:27,349 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:18:27,366 - INFO - Successfully processed paragraph 1
+2025-07-29 21:18:30,727 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:18:30,741 - INFO - Successfully processed paragraph 2
+2025-07-29 21:18:34,209 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:18:34,218 - INFO - Successfully processed paragraph 3
+2025-07-29 21:18:40,865 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:18:40,880 - INFO - Successfully processed paragraph 4
+2025-07-29 21:18:45,371 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:18:45,385 - INFO - Successfully processed paragraph 5
+2025-07-29 21:18:46,386 - INFO - Completed batch 1
+2025-07-29 21:18:49,774 - INFO - HTTP Request: POST https://api.mistral.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-07-29 21:18:49,787 - INFO - Successfully processed paragraph 6
+2025-07-29 21:18:50,788 - INFO - Completed batch 2
+2025-07-29 21:18:50,788 - INFO - Processing complete. Successfully processed 6/6 paragraphs
+2025-07-29 21:18:50,788 - INFO - Step 3: Exporting to CSV
+2025-07-29 21:18:50,788 - INFO - Exporting loan data to loans_20250729_211821.csv
+2025-07-29 21:18:50,790 - INFO - CSV export completed: loans_20250729_211821.csv
+2025-07-29 21:18:50,791 - INFO - Processing Statistics:
+2025-07-29 21:18:50,791 - INFO -   Total paragraphs: 6
+2025-07-29 21:18:50,791 - INFO -   Processed paragraphs: 6
+2025-07-29 21:18:50,791 - INFO -   Extracted loans: 6
+2025-07-29 21:18:50,791 - INFO -   Errors: 0
+2025-07-29 21:18:50,791 - INFO -   Success rate: 100.0%
