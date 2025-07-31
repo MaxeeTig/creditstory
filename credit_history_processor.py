@@ -117,12 +117,25 @@ class CreditHistoryProcessor:
             return text
         return ""
     
+        
+    # Improved function for extraction 
+        
     def extract_paragraphs_from_pdf(self, pdf_path: str, start_page: int, end_page: int) -> int:
-        """Extract paragraphs from PDF using regex patterns"""
+        """Extract full loan entries from PDF including all details"""
         logger.info(f"Extracting paragraphs from {pdf_path} (pages {start_page}-{end_page})")
         
-        # Pattern from test_read1.py - extract full loan entries
-        pattern = r'\d+\.\s+(.+?)\s+-\s+Договор займа\s*\(кредита\)\s+-\s+(.+?)(?=\s*\d+\.|\Z)'
+        # Pattern to identify loan headers
+        header_pattern = r'''
+            ^\d+\.\s+                      # Number and dot
+            (.+?)                          # Bank name
+            \s+-\s+                        # Separator
+            (?:Договор\s+займа\s*\(кредита\)
+            |Поручительство\s+по\s+займу\s*\(кредиту\)
+            |Потребит\.кредит
+            |Кредитная\s+карта
+            |Микрокредит)
+            \s*(?:-\s*([^-]+))?
+            '''
         
         extracted_count = 0
         
@@ -136,27 +149,37 @@ class CreditHistoryProcessor:
                 if not text.strip():
                     continue
                 
-                # Find loan entries
-                matches = re.finditer(pattern, text, re.DOTALL)
+                # Find all header positions first
+                headers = list(re.finditer(header_pattern, text, re.VERBOSE | re.MULTILINE | re.IGNORECASE))
                 
-                for match in matches:
-                    # Extract the full content for this loan entry
-                    full_content = match.group(0).strip()
+                # Extract full content between headers
+                for i, match in enumerate(headers):
+                    start_pos = match.start()
                     
-                    # Clean up the content (remove extra whitespace but keep structure)
+                    # Determine end position (next header or end of text)
+                    end_pos = headers[i+1].start() if i+1 < len(headers) else len(text)
+                    
+                    full_content = text[start_pos:end_pos].strip()
+                    
+                    # Clean up but preserve structure
                     full_content = re.sub(r'\s+', ' ', full_content)
                     full_content = full_content.replace('\n', ' ')
                     
-                    if len(full_content) > 50:  # Minimum meaningful length
+                    # Debug print content and length
+                    #print(f"Extracted: {full_content}, {len(full_content)}")
+                    
+                    if len(full_content) > 100:  # Increased minimum length
                         self._store_paragraph(full_content, page_num + 1)
                         extracted_count += 1
-                        logger.info(f"Extracted loan entry: {full_content[:100]}...")
+                        logger.debug(f"Extracted loan entry ({len(full_content)} chars): {full_content[:100]}...")
                 
                 if (page_num + 1) % 50 == 0:
                     logger.info(f"Processed page {page_num + 1}")
         
-        logger.info(f"Extracted {extracted_count} paragraphs")
+        logger.info(f"Extracted {extracted_count} full loan entries")
         return extracted_count
+
+        
     
     def _store_paragraph(self, content: str, page_number: int):
         """Store paragraph in database"""
