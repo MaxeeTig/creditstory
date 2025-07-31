@@ -25,6 +25,25 @@ def extract_bank_loan_info(text):
     matches = re.finditer(pattern, text, re.DOTALL)
     return matches
 
+# ==== Function to find headers like "1. " 
+def find_all_loan_headers(text):
+    """
+    Finds all loan headers in the text and returns them with their positions
+    """
+    pattern = r'^\d+\.\s+.+?(?=\n|$)'  # Matches numbered headers at start of line
+    matches = re.finditer(pattern, text, re.MULTILINE)
+    
+    headers = []
+    for match in matches:
+        headers.append({
+            'header': match.group(),
+            'start_pos': match.start(),
+            'end_pos': match.end()
+        })
+    return headers
+
+
+
 def main():
     if len(sys.argv) < 4:
         print("Usage: python test_read1.py <partial_file_name> <start_page> <end_page>")
@@ -46,7 +65,14 @@ def main():
     # Read and process PDF
     text = read_pdf(pdf_file, start_page, end_page)
     matches = extract_bank_loan_info(text)
+    
+    # Capture headers only 
+    headers = find_all_loan_headers(text)
 
+    print(f"Found {len(headers)} loan headers:")
+    for i, header in enumerate(headers, 1):
+        print(f"{i}. {header['header']} (position {header['start_pos']}-{header['end_pos']})")
+    
     # Prepare report content
     report_content = []
     report_content.append(f"Credit History Report - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -54,10 +80,13 @@ def main():
     report_content.append("\nList of banks and loan types:")
     
     for i, match in enumerate(matches, 1):
+        
+                
+
         bank = match.group(1).replace('\n', ' ').strip()
         loan_type = match.group(2).replace('\n', ' ').strip()
         line = f"{i}. {bank}: {loan_type}"
-        print(line)  # Print to console
+        #print(line)  # Print to console
         report_content.append(line)
 
     # Write output files
