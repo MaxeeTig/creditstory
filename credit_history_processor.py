@@ -54,6 +54,7 @@ class Loan(BaseModel):
     loan_amount: Optional[float] = Field(None, description="Principal amount of the loan")
     loan_currency: Optional[str] = Field(None, description="Currency of the loan")
     termination_date: Optional[date] = Field(None, description="Date when the loan was terminated")
+    actual_termination_date: Optional[date] = Field(None, description="Actual termination date when loan was closed")  
     loan_status: Optional[str] = Field(None, description="Current status of the loan")
     extracted_at: datetime = Field(default_factory=datetime.now)
     
@@ -166,7 +167,7 @@ class CreditHistoryProcessor:
                     full_content = full_content.replace('\n', ' ')
                     
                     # Debug print content and length
-                    #print(f"Extracted: {full_content}, {len(full_content)}")
+                    print(f"Extracted: {full_content}, {len(full_content)}")
                     
                     if len(full_content) > 100:  # Increased minimum length
                         self._store_paragraph(full_content, page_num + 1)
@@ -210,28 +211,94 @@ class CreditHistoryProcessor:
     
     def extract_loan_parameters(self, paragraph: Paragraph) -> Optional[Loan]:
         """Extract loan parameters using Mistral AI"""
+        
+        system_prompt = """You are an expert financial data parser that extracts loan information from Russian credit reports. 
+        The input text represents a flattened table with these characteristics:
+        1. Field names appear in the text followed by their values at specific offsets
+        2. Each field has a consistent positional offset from its label
+        3. Values may contain multiple words/numbers
+
+        Extraction Rules:
+        1. Use these exact field mappings and offsets:
+           | Russian Label                  | English Field       | Value Offset | Example Value               |
+           |--------------------------------|---------------------|--------------|-----------------------------|
+           | "Полное наименование"          | bank_name           | +3           | "АО Райффайзенбанк"         |
+           | "Дата сделки"                  | deal_date           | +6           | "18-05-2024"                |
+           | "Тип сделки"                   | deal_type           | +6           | "Договор займа (кредита)"   |
+           | "Вид займа (кредита)"          | loan_type           | +6           | "Иной заем (кредит)"        |
+           | "Использование платежной карты"| card_usage          | +6           | "Да" → true                 |
+           | "Сумма и валюта"               | loan_amount         | +6           | "50000,00 RUB"              |
+           | "Дата прекращения по условиям" | termination_date    | +6           | "31-12-9999" → null         |
+           | "Дата фактического прекращения"| actual_termination  | +6           | "Н/Д" → null                |
+
+        2. Value extraction process:
+           a. Locate the Russian label in text
+           b. Count N words/tokens after it (based on offset)
+           c. Capture the value at that position
+
+        Required Output Format (JSON):
+        {
+          "bank_name": "string",
+          "deal_date": "DD-MM-YYYY",
+          "deal_type": "string",
+          "loan_type": "string",
+          "card_usage": boolean,
+          "loan_amount": "number,currency",
+          "termination_date": "DD-MM-YYYY or null",
+          "actual_termination_date": "DD-MM-YYYY or null"
+        }
+
+        Special Cases:
+        1. For termination dates:
+           - "31-12-9999" → null (active loan)
+           - "Н/Д" → null
+        2. For boolean fields:
+           - "Да" → true
+           - "Нет" → false
+        3. Preserve original formatting for:
+           - Bank names (keep Russian characters)
+           - Loan amounts ("50000,00 RUB")
+
+        Example Input 1:
+        "Полное наименование ОГРН/ИНН Вид Акционерное общество Райффайзенбанк ... Дата сделки Тип сделки Вид займа (кредита) Использование платежной карты Сумма и валюта Дата прекращения по условиям сделки 18-05-2024 Договор займа (кредита) Иной заем (кредит) Да 50000,00 RUB 31-12-9999"
+
+        Example Output 1:
+        {
+          "bank_name": "Акционерное общество Райффайзенбанк",
+          "deal_date": "18-05-2024",
+          "deal_type": "Договор займа (кредита)",
+          "loan_type": "Иной заем (кредит)",
+          "card_usage": true,
+          "loan_amount": "50000,00 RUB",
+          "termination_date": null,
+          "actual_termination_date": null
+        }
+
+        Example Input 2:
+        "Полное наименование ОГРН/ИНН Вид ПАО Сбербанк 1027700132195 7707083893 ... Дата сделки Тип сделки Вид займа (кредита) Использование платежной карты Сумма и валюта Дата прекращения по условиям сделки 15-01-2023 Потребительский кредит Нет 120000,00 RUB 15-01-2025"
+
+        Example Output 2:
+        {
+          "bank_name": "ПАО Сбербанк",
+          "deal_date": "15-01-2023",
+          "deal_type": "Потребительский кредит",
+          "loan_type": "Потребительский кредит",
+          "card_usage": false,
+          "loan_amount": "120000,00 RUB",
+          "termination_date": "15-01-2025",
+          "actual_termination_date": null
+        }
+
+        Now parse the following input text and return ONLY valid JSON:
+        """
+        
         try:
             response = self.mistral_client.chat.complete(
-                model="mistral-small-latest",
+                model="mistral-large-latest",
                 messages=[
                     {
                         "role": "system",
-                        "content": """Extract loan information as JSON with these exact field names: 
-                        bank_name, deal_date (DD-MM-YYYY or null), deal_type, loan_type, 
-                        card_usage (true/false or null), loan_amount (number or null), 
-                        loan_currency (3 letters or null), termination_date (DD-MM-YYYY or null).
-                        If a field cannot be determined, use null. Format must be valid JSON.
-                        Example:
-                        {
-                            "bank_name": "Bank Name",
-                            "deal_date": "01-01-2023",
-                            "deal_type": "Loan Type",
-                            "loan_type": "Loan Category",
-                            "card_usage": true,
-                            "loan_amount": 10000,
-                            "loan_currency": "RUB",
-                            "termination_date": "31-12-2025"
-                        }"""
+                        "content": system_prompt
                     },
                     {
                         "role": "user",
@@ -244,6 +311,9 @@ class CreditHistoryProcessor:
             
             json_str = response.choices[0].message.content
             
+            # Debug print
+            print(f"json from LLM:{json_str}")
+            
             # Clean the response if needed
             if json_str.startswith('[') and json_str.endswith(']'):
                 json_str = json_str[1:-1]
@@ -251,16 +321,65 @@ class CreditHistoryProcessor:
             loan_data = json.loads(json_str)
             loan_data['paragraph_id'] = paragraph.id
             
+            # Process amount/currency if present
+            if 'loan_amount' in loan_data and loan_data['loan_amount']:
+                amount_str = loan_data['loan_amount']
+                
+                # Extract currency (last 3 characters)
+                if len(amount_str) >= 3:
+                    loan_data['loan_currency'] = amount_str[-3:].strip()
+                    
+                    # Convert amount to float (handle both , and . as decimal separator)
+                    amount_part = amount_str[:-3].strip()
+                    amount_part = amount_part.replace(',', '.')  # Convert comma to dot
+                    try:
+                        loan_data['loan_amount'] = float(amount_part)
+                    except ValueError:
+                        loan_data['loan_amount'] = None
+                        loan_data['loan_currency'] = None
+                else:
+                    loan_data['loan_amount'] = None
+                    loan_data['loan_currency'] = None
+            
+            # Convert date strings and handle special cases
+            date_fields = {
+                'deal_date': "%d-%m-%Y",
+                'termination_date': "%d-%m-%Y",
+                'actual_termination_date': "%d-%m-%Y"
+            }
+            
+            
+            for field, fmt in date_fields.items():
+                if field in loan_data and loan_data[field]:
+                    if isinstance(loan_data[field], str) and loan_data[field].upper() == 'Н/Д':
+                        loan_data[field] = None
+                    elif isinstance(loan_data[field], str) and loan_data[field] == "31-12-9999":
+                        loan_data[field] = None
+                        loan_data['original_termination'] = "31-12-9999"  # Store original for status determination
+                    else:
+                        try:
+                            loan_data[field] = datetime.strptime(loan_data[field], fmt).date()
+                        except (ValueError, TypeError):
+                            loan_data[field] = None
+                            
+                        
+            
             # Create Loan object
             loan = Loan(**loan_data)
             
-            # Determine status if not provided
+            
+            # Determine status according to business rules
             if not loan.loan_status:
-                if loan.termination_date and loan.termination_date.strftime("%d-%m-%Y") != "31-12-9999":
+                if hasattr(loan, 'original_termination') and loan.original_termination == "31-12-9999":
+                    loan.loan_status = "Active"
+                elif loan.termination_date and not loan.actual_termination_date:
+                    loan.loan_status = "Active"
+                elif loan.termination_date and loan.actual_termination_date:
                     loan.loan_status = "Closed"
                 else:
                     loan.loan_status = "Active"
-            
+                        
+                
             return loan
             
         except Exception as e:
