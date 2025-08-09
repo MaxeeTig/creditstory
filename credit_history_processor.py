@@ -104,6 +104,7 @@ class CreditHistoryProcessor:
                     loan_amount REAL,
                     loan_currency TEXT,
                     termination_date TEXT,
+                    actual_termination_date TEXT,
                     loan_status TEXT,
                     extracted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (paragraph_id) REFERENCES paragraphs (id)
@@ -140,6 +141,10 @@ class CreditHistoryProcessor:
         
         extracted_count = 0
         
+        # First, extract all text from all pages in the range
+        all_text = ""
+        page_boundaries = []  # Track where each page starts in the combined text
+        
         with open(pdf_path, 'rb') as f:
             reader = PdfReader(f)
             
@@ -147,35 +152,53 @@ class CreditHistoryProcessor:
                 page = reader.pages[page_num]
                 text = page.extract_text(visitor_text=self.visitor_body)
                 
-                if not text.strip():
-                    continue
-                
-                # Find all header positions first
-                headers = list(re.finditer(header_pattern, text, re.VERBOSE | re.MULTILINE | re.IGNORECASE))
-                
-                # Extract full content between headers
-                for i, match in enumerate(headers):
-                    start_pos = match.start()
-                    
-                    # Determine end position (next header or end of text)
-                    end_pos = headers[i+1].start() if i+1 < len(headers) else len(text)
-                    
-                    full_content = text[start_pos:end_pos].strip()
-                    
-                    # Clean up but preserve structure
-                    full_content = re.sub(r'\s+', ' ', full_content)
-                    full_content = full_content.replace('\n', ' ')
-                    
-                    # Debug print content and length
-                    print(f"Extracted: {full_content}, {len(full_content)}")
-                    
-                    if len(full_content) > 100:  # Increased minimum length
-                        self._store_paragraph(full_content, page_num + 1)
-                        extracted_count += 1
-                        logger.debug(f"Extracted loan entry ({len(full_content)} chars): {full_content[:100]}...")
+                if text.strip():
+                    # Record where this page starts in the combined text
+                    page_boundaries.append({
+                        'page_num': page_num + 1,
+                        'start_pos': len(all_text),
+                        'end_pos': len(all_text) + len(text)
+                    })
+                    all_text += text + "\n"  # Add page separator
                 
                 if (page_num + 1) % 50 == 0:
                     logger.info(f"Processed page {page_num + 1}")
+        
+        if not all_text.strip():
+            logger.warning("No text extracted from PDF")
+            return 0
+        
+        # Now find all headers in the combined text
+        headers = list(re.finditer(header_pattern, all_text, re.VERBOSE | re.MULTILINE | re.IGNORECASE))
+        logger.info(f"Found {len(headers)} loan headers in combined text")
+        
+        # Extract full content between headers
+        for i, match in enumerate(headers):
+            start_pos = match.start()
+            
+            # Determine end position (next header or end of text)
+            end_pos = headers[i+1].start() if i+1 < len(headers) else len(all_text)
+            
+            full_content = all_text[start_pos:end_pos].strip()
+            
+            # Clean up but preserve structure
+            full_content = re.sub(r'\s+', ' ', full_content)
+            full_content = full_content.replace('\n', ' ')
+            
+            # Debug print content and length
+            print(f"Extracted: {full_content[:200]}..., Length: {len(full_content)}")
+            
+            if len(full_content) > 100:  # Increased minimum length
+                # Determine which page this loan entry starts on
+                page_number = start_page  # default
+                for boundary in page_boundaries:
+                    if boundary['start_pos'] <= start_pos < boundary['end_pos']:
+                        page_number = boundary['page_num']
+                        break
+                
+                self._store_paragraph(full_content, page_number)
+                extracted_count += 1
+                logger.debug(f"Extracted loan entry ({len(full_content)} chars): {full_content[:100]}...")
         
         logger.info(f"Extracted {extracted_count} full loan entries")
         return extracted_count
@@ -229,12 +252,19 @@ class CreditHistoryProcessor:
            | "Использование платежной карты"| card_usage          | +6           | "Да" → true                 |
            | "Сумма и валюта"               | loan_amount         | +6           | "50000,00 RUB"              |
            | "Дата прекращения по условиям" | termination_date    | +6           | "31-12-9999" → null         |
-           | "Дата фактического прекращения"| actual_termination  | +6           | "Н/Д" → null                |
+           | "Дата фактического прекращения"| actual_termination_date | +6       | "24-01-2025" or "Н/Д" → null |
 
         2. Value extraction process:
            a. Locate the Russian label in text
            b. Count N words/tokens after it (based on offset)
            c. Capture the value at that position
+
+        3. IMPORTANT: For "Дата фактического прекращения" (actual_termination_date):
+           - Look for patterns like "фактического прекращения" followed by a date in DD-MM-YYYY format
+           - Also search for "Дата фактического прекращения" directly
+           - The date may appear anywhere after this label in the text
+           - Common patterns: "24-01-2025", "01-04-2021", etc.
+           - If you find "Н/Д" or similar, return null
 
         Required Output Format (JSON):
         {
@@ -275,7 +305,7 @@ class CreditHistoryProcessor:
         }
 
         Example Input 2:
-        "Полное наименование ОГРН/ИНН Вид ПАО Сбербанк 1027700132195 7707083893 ... Дата сделки Тип сделки Вид займа (кредита) Использование платежной карты Сумма и валюта Дата прекращения по условиям сделки 15-01-2023 Потребительский кредит Нет 120000,00 RUB 15-01-2025"
+        "Полное наименование ОГРН/ИНН Вид ПАО Сбербанк 1027700132195 7707083893 ... Дата сделки Тип сделки Вид займа (кредита) Использование платежной карты Сумма и валюта Дата прекращения по условиям сделки 15-01-2023 Потребительский кредит Нет 120000,00 RUB 15-01-2025 ... Дата фактического прекращения 24-01-2025"
 
         Example Output 2:
         {
@@ -286,7 +316,7 @@ class CreditHistoryProcessor:
           "card_usage": false,
           "loan_amount": "120000,00 RUB",
           "termination_date": "15-01-2025",
-          "actual_termination_date": null
+          "actual_termination_date": "24-01-2025"
         }
 
         Now parse the following input text and return ONLY valid JSON:
@@ -440,14 +470,15 @@ class CreditHistoryProcessor:
             conn.execute("""
                 INSERT INTO loans (
                     paragraph_id, bank_name, deal_date, deal_type, loan_type,
-                    card_usage, loan_amount, loan_currency, termination_date, loan_status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    card_usage, loan_amount, loan_currency, termination_date, actual_termination_date, loan_status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 loan.paragraph_id, loan.bank_name, 
                 loan.deal_date.isoformat() if loan.deal_date else None,
                 loan.deal_type, loan.loan_type, loan.card_usage,
                 loan.loan_amount, loan.loan_currency,
                 loan.termination_date.isoformat() if loan.termination_date else None,
+                loan.actual_termination_date.isoformat() if loan.actual_termination_date else None,
                 loan.loan_status
             ))
             
@@ -476,7 +507,7 @@ class CreditHistoryProcessor:
                 SELECT 
                     l.id, l.paragraph_id, l.bank_name, l.deal_date, l.deal_type,
                     l.loan_type, l.card_usage, l.loan_amount, l.loan_currency,
-                    l.termination_date, l.loan_status, l.extracted_at,
+                    l.termination_date, l.actual_termination_date, l.loan_status, l.extracted_at,
                     p.page_number
                 FROM loans l
                 JOIN paragraphs p ON l.paragraph_id = p.id
@@ -487,7 +518,7 @@ class CreditHistoryProcessor:
                 fieldnames = [
                     'id', 'paragraph_id', 'page_number', 'bank_name', 'deal_date',
                     'deal_type', 'loan_type', 'card_usage', 'loan_amount',
-                    'loan_currency', 'termination_date', 'loan_status', 'extracted_at'
+                    'loan_currency', 'termination_date', 'actual_termination_date', 'loan_status', 'extracted_at'
                 ]
                 
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -506,9 +537,10 @@ class CreditHistoryProcessor:
                         'loan_amount': row[7],
                         'loan_currency': row[8],
                         'termination_date': row[9],
-                        'loan_status': row[10],
-                        'extracted_at': row[11],
-                        'page_number': row[12]
+                        'actual_termination_date': row[10],
+                        'loan_status': row[11],
+                        'extracted_at': row[12],
+                        'page_number': row[13]
                     }
                     writer.writerow(row_dict)
         
